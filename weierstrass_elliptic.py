@@ -2,6 +2,9 @@ from mpmath import jtheta, pi, exp, sqrt, polyroots, agm, log, elliprf
 
 class WeierstrassElliptic:
     
+    # This is a slightly modified version of the package developed by user stla on github
+    # https://github.com/stla/pyweierstrass/blob/main/pyweierstrass/weierstrass.py
+    
     def __init__(self):
         pass  
 
