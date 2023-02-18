@@ -1,4 +1,4 @@
-from mpmath import jtheta, pi, exp, sqrt, agm, qfrom, mpc, elliprf, im, zeta, polyroots, almosteq
+from mpmath import jtheta, pi, exp, sqrt, agm, qfrom, mpc, elliprf, im, zeta, polyroots, almosteq, gamma
 from math import isinf
 
 class Weierstrass:
@@ -274,7 +274,7 @@ class Weierstrass:
             e1, e2, e3 = self.complex_sort([e1, e2, e3], ascending=False)
         return e1, e2, e3
 
-    def omega_from_g(self, g2, g3, tolerance=1e-12):
+    def omega_from_g(self, g2, g3, tolerance=1e-10):
         """
         Half-periods from elliptical invariants.
 
@@ -312,9 +312,13 @@ class Weierstrass:
         - 
 
         """
-        tau = self.tau_from_g(g2, g3)
-        G4, G6 = self.eisenstein_G4_G6(tau) # G4(1,tau), G6(1, tau) 
-        omegaA = sqrt(g2/g3 * G6/G4 * 7/12)
+        if g2 == 0:
+            omegaA = g3^(-1/6) * gamma(1/3)**3 / 4 / pi
+            tau = mpc(0.5, sqrt(3)/2)
+        else:
+            tau = self.tau_from_g(g2, g3)
+            G4, G6 = self.eisenstein_G4_G6(tau) # G4(1,tau), G6(1, tau) 
+            omegaA = sqrt(g2/g3 * G6/G4 * 7/12)
         omegaB = tau * omegaA
         omegaC = omegaA + omegaB
         # Assign omega1, omega2, omega3 labels to match e1, e2, e3 using mean absolute error comparrison
