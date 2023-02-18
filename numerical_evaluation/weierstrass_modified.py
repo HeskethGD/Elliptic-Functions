@@ -3,8 +3,11 @@ from math import isinf
 
 class Weierstrass:
     
+    # This is a slightly modified version of the package developed by user stla on github
+    # https://github.com/stla/pyweierstrass/blob/main/pyweierstrass/weierstrass.py
+    
     """
-    Important resource: Apostol T.M. Modular functions and Dirichlet series in number theory,
+    Useful resource: Apostol T.M. Modular functions and Dirichlet series in number theory,
     Section 2.8 Application to the Inversion of Eisenstein Series
     http://www.paris8.free.fr/Apostol%20T.M.%20Modular%20functions%20and%20Dirichlet%20series%20in%20number%20theory%20(Springer,1990)(600dpi)(T)(216s)_MT_.pdf
     """
@@ -47,7 +50,7 @@ class Weierstrass:
         complex
             The value of the inverse of the klein-j invariant function at `z`.
             
-        GH Note: See Inverse Function Method 1 here:
+        Note: See Inverse Function Method 1 here:
         https://en.wikipedia.org/wiki/J-invariant
 
         """
@@ -74,11 +77,11 @@ class Weierstrass:
         complex
             The value of the Eisenstein E4 and E6 series' at `tau`.
             
-        GH Note: See Identities Involving Eisenstein Series here: 
+        Note: See Identities Involving Eisenstein Series here: 
         https://en.wikipedia.org/wiki/Eisenstein_series
         
-        See Eq1.7 here for a different way to express E6 and G6 in terms of theta functions
-        that avoids the sqrt which appears to prevent some numerical errors in tests
+        Note: See Eq1.7 here for a different way to express E6 and G6 in terms of theta functions
+        that avoids the sqrt on the previous wikipedia link and appears to prevent some numerical errors in tests
         https://arxiv.org/pdf/1806.06725.pdf
 
         """
@@ -108,7 +111,7 @@ class Weierstrass:
         complex
             The value of the Eisenstein G4 and G6 series at `tau`.
             
-        GH Note: See Fourier Series section here to relate G to E: 
+        Note: See Fourier Series section here to relate G to E: 
         https://en.wikipedia.org/wiki/Eisenstein_series
         2*zeta(4) = pi**4 / 45
 
@@ -215,16 +218,18 @@ class Weierstrass:
         and then where the real part is equal, by the imaginary part.
         For real roots: e1 > e2 > e3.
         
-        GH Note: This work in C++ appears to define roots based on some relation to theta functions
+        Note: This work in C++ appears to define roots based on some relation to theta functions
         It is not yet clear why they do that, it may be motivated by order or speed.
         https://github.com/bluescarni/w_elliptic/blob/master/src/w_elliptic.hpp
         https://dlmf.nist.gov/23.6
+        Using theta functions appears to be 10x faster than solving the cubic. 
+        Recommend using roots_from_omega1_omega2 where possible.
             
         """
         e1, e2, e3 = self.complex_sort(polyroots([4, 0, -g2, -g3]), ascending=False)
         return e1, e2, e3
     
-    def sorted_roots_from_omega1_omega2(self, omega1, omega2):
+    def roots_from_omega1_omega2(self, omega1, omega2, sorting=True):
         """
         Parameters
         ----------
@@ -240,12 +245,12 @@ class Weierstrass:
         and then where the real part is equal, by the imaginary part.
         For real roots: e1 > e2 > e3.
         
-        GH Note: This work in C++ appears to define roots based on some relation to theta functions
-        It is not yet clear why they do that, it may be motivated by order or speed.
+        Note: This work in C++ appears to define roots based on their relation to theta functions
+        This may be motivated by order or speed.
         https://github.com/bluescarni/w_elliptic/blob/master/src/w_elliptic.hpp
         https://dlmf.nist.gov/23.6
         
-        Update: Using theta functions appears to be 10x faster:
+        Using theta functions appears to be 10x faster than solving the cubic:
         from mpmath import timing
         g2_num = mpc(real=f'{2*num_span*(random() - 0.5)}', imag=f'{2*num_span*(random() - 0.5)}')
         g3_num = mpc(real=f'{2*num_span*(random() - 0.5)}', imag=f'{2*num_span*(random() - 0.5)}')
@@ -253,8 +258,8 @@ class Weierstrass:
         omega1, omega2, omega3
         if im(omega2/omega1) <= 0:
             omega2 = -omega2
-        print(timing(wst.sorted_roots_from_omega1_omega2,omega1, omega2))
-        print(timing(wst.sorted_roots_from_g2_g3,g2_num,g3_num))
+        print(timing(wst.roots_from_omega1_omega2, omega1, omega2))
+        print(timing(wst.sorted_roots_from_g2_g3, g2_num, g3_num))
             
         """
         tau = omega2/omega1
@@ -265,7 +270,8 @@ class Weierstrass:
         e1 = c * ( j24 + 2 * j44 )
         e2 = c * ( j24 - j44 )
         e3 = - c * ( 2 * j24 + j44 )
-        e1, e2, e3 = self.complex_sort([e1, e2, e3], ascending=False)
+        if sorting:
+            e1, e2, e3 = self.complex_sort([e1, e2, e3], ascending=False)
         return e1, e2, e3
 
     def omega_from_g(self, g2, g3, tolerance=1e-12):
@@ -290,7 +296,7 @@ class Weierstrass:
             then by the imaginary part. For real roots: e1 > e2 > e3.
             Note that only two half-periods are linearly independent.
             
-        GH Note: Series relationship for half periods: 
+        Note: Series relationship for half periods: 
         https://functions.wolfram.com/EllipticFunctions/WeierstrassHalfPeriods/02/
         - The series for g2 alone only defines the periods up to a quartic root of unity which can cause errors 
           if the correct root is not chosen.
@@ -311,11 +317,12 @@ class Weierstrass:
         omegaA = sqrt(g2/g3 * G6/G4 * 7/12)
         omegaB = tau * omegaA
         omegaC = omegaA + omegaB
+        # Assign omega1, omega2, omega3 labels to match e1, e2, e3 using mean absolute error comparrison
         omegas = [omegaA, omegaB, omegaC]
         wps = [self.wp(omegaN, (omegaA, omegaB)) for omegaN in omegas]
         index_combos = [(0,1,2), (0,2,1), (1,0,2), (1,2,0), (2,0,1), (2,1,0)]
-        e1, e2, e3 = self.sorted_roots_from_omega1_omega2(omegaA, omegaB)
-#         e1, e2, e3 = self.sorted_roots_from_g2_g3(g2, g3)
+        e1, e2, e3 = self.roots_from_omega1_omega2(omegaA, omegaB)
+        # e1, e2, e3 = self.sorted_roots_from_g2_g3(g2, g3)
         maes = [(abs(e1 - wps[ic[0]]) + abs(e2 - wps[ic[1]]) + abs(e3 - wps[ic[2]])) / 3 for ic in index_combos]
         mae = min(maes)
         min_index= maes.index(mae)
@@ -329,7 +336,6 @@ class Weierstrass:
                 wp(omega3)={wps[index_combos[min_index][2]]}, tau={tau}
                 """
             )
-        
         omega1, omega2, omega3 = [omegas[k] for k in index_combos[min_index]]
         return omega1, omega2, omega3
 
@@ -452,8 +458,8 @@ class Weierstrass:
         eta1 = p / 6 / w1 * jtheta(1, 0, q, 3) / jtheta(1, 0, q, 1)
         return -eta1 * z + p * jtheta(1, p*z, q, 1) / jtheta(1, p*z, q)
 
-    # inverse Weierstrass p-function
-    def invwp(self, w, omega):
+    # Inverse Weierstrass p-function
+    def invwp(self, w, omega, w_prime=None):
         """
         Inverse Weierstrass p-function.
 
@@ -468,18 +474,21 @@ class Weierstrass:
         -------
         z : complex 
             The value z of the inverse Weierstrass p-function evaluated at w.
+            If the value of the derivative Weierstrass p prime evaluated at z is specified
+            an attempt to pick the right sign for z is made. 
             
-        GH Note: See Eq1.31 here https://arxiv.org/pdf/1806.06725.pdf
-        It seems common to find the roots using theta functions as opposed to a standard root finding algo
-        It is not yet clear why this is done, perhaps it is speed or perhaps it is ordering.
-        It is also not clear why the roots are found below using wp.
+        Note: See Eq 1.31 here https://arxiv.org/pdf/1806.06725.pdf
 
         """
         omega1, omega2 = omega
         if im(omega2/omega1) <= 0:
             raise Exception("The imaginary part of the periods ratio is negative.")
-        e1 = self.wp(omega1, omega)
-        e2 = self.wp(omega2, omega)
-        e3 = self.wp(-omega1-omega2, omega)
+        # e1 = self.wp(omega1, omega)
+        # e2 = self.wp(omega2, omega)
+        # e3 = self.wp(-omega1-omega2, omega)
+        e1, e2, e3 = self.roots_from_omega1_omega2(omega1, omega2, sorting=False)
         z = elliprf(w-e1, w-e2, w-e3)
+        if wp_prime:
+            if abs(self.wpprime(-z, omega) - wp_prime) < abs(self.wpprime(z, omega) - wp_prime):
+                return -z
         return z
