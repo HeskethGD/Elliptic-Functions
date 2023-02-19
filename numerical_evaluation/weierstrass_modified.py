@@ -313,20 +313,25 @@ class Weierstrass:
 
         """
         if g2 == 0:
-            omegaA = g3^(-1/6) * gamma(1/3)**3 / 4 / pi
+            omegaA = g3 ** (-1/6) * gamma(1/3) ** 3 / 4 / pi
             tau = mpc(0.5, sqrt(3)/2)
+        elif g3 == 0:
+            tau = self.tau_from_g(g2, g3)
+            G4, G6 = self.eisenstein_G4_G6(tau) # G4(1,tau), G6(1, tau)
+            omegaA = 1j * (15 / 4 / g2 * G4) ** (1/4)
         else:
             tau = self.tau_from_g(g2, g3)
             G4, G6 = self.eisenstein_G4_G6(tau) # G4(1,tau), G6(1, tau) 
             omegaA = sqrt(g2/g3 * G6/G4 * 7/12)
+            
         omegaB = tau * omegaA
         omegaC = omegaA + omegaB
+        
         # Assign omega1, omega2, omega3 labels to match e1, e2, e3 using mean absolute error comparrison
         omegas = [omegaA, omegaB, omegaC]
         wps = [self.wp(omegaN, (omegaA, omegaB)) for omegaN in omegas]
         index_combos = [(0,1,2), (0,2,1), (1,0,2), (1,2,0), (2,0,1), (2,1,0)]
         e1, e2, e3 = self.roots_from_omega1_omega2(omegaA, omegaB)
-        # e1, e2, e3 = self.sorted_roots_from_g2_g3(g2, g3)
         maes = [(abs(e1 - wps[ic[0]]) + abs(e2 - wps[ic[1]]) + abs(e3 - wps[ic[2]])) / 3 for ic in index_combos]
         mae = min(maes)
         min_index= maes.index(mae)
@@ -410,38 +415,6 @@ class Weierstrass:
         if im(omega2/omega1) <= 0:
             raise Exception("The imaginary part of the periods ratio is negative.")
         return self._wpprime_from_omega1_and_tau(z, omega1, omega2 / omega1)
-
-
-#     # Weierstrass sigma function
-#     def wsigma(self, z, omega):
-#         """
-#         Weierstrass sigma function.
-
-#         Parameters
-#         ----------
-#         z : complex
-#             A complex number.
-#         omega : complex pair
-#             A pair of complex numbers, the half-periods.
-
-#         Returns
-#         -------
-#         complex 
-#             The Weierstrass sigma function evaluated at `z`.
-            
-#         Note: The formula relating sigma to theta functions can be found here:
-#         https://mathworld.wolfram.com/WeierstrassSigmaFunction.html
-
-#         """
-#         omega1, omega2 = omega
-#         w1 = -2 * omega1 / pi
-#         tau = omega2 / omega1
-#         if im(tau) <= 0:
-#             raise Exception("The imaginary part of the periods ratio is negative.")
-#         q = qfrom(tau = tau)
-#         f = jtheta(1, 0, q, 1)
-#         h = -pi / 6 / w1 * jtheta(1, 0, q, 3) / f
-#         return w1 * exp(h*z*z/w1/pi) * jtheta(1, z/w1, q) / f
 
     # Weierstrass sigma function
     def wsigma(self, z, omega):

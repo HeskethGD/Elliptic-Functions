@@ -127,7 +127,7 @@ def eisensteinG6(tau):
 
 def _half_periods(g2, g3):
     if g2 == 0:
-        omega1 = g3^(-1/6) * gamma(1/3)**3 / 4 / pi
+        omega1 = g3**(-1/6) * gamma(1/3)**3 / 4 / pi
         tau = mpc(0.5, sqrt(3)/2)
     else:
         g2cube = g2 * g2 * g2
@@ -135,11 +135,13 @@ def _half_periods(g2, g3):
         if (isinf(j.real) or isinf(j.imag)):
             return -1j*pi/2/sqrt(3), mpc("inf", "inf")
         tau = kleinjinv(j)
-        omega1 = sqrt(
-            7 * eisensteinG6(tau) * g2 / (12 * eisensteinG4(tau) * g3)
-        )
-        # t = 15 / 4 / g2 * eisensteinG4(tau)
-        # omega1 = 1j * t**(0.25)
+        if g3 == 0:
+            t = 15 / 4 / g2 * eisensteinG4(tau)
+            omega1 = 1j * t**(0.25)
+        else:
+            omega1 = sqrt(
+                7 * eisensteinG6(tau) * g2 / (12 * eisensteinG4(tau) * g3)
+            )
     return omega1, tau
 
 def omega_from_g(g2, g3):
