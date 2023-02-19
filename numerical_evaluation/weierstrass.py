@@ -1,7 +1,7 @@
+# copied from https://github.com/stla/pyweierstrass/blob/main/pyweierstrass/weierstrass.py
+
 from mpmath import jtheta, pi, exp, sqrt, agm, qfrom, mpc, elliprf, im, gamma
 from math import isinf
-
-# copied from https://github.com/stla/pyweierstrass/blob/main/pyweierstrass/weierstrass.py
 
 def kleinjinv(z):
     """
@@ -62,6 +62,33 @@ def eisensenteinE4(tau):
         x2 * x2 + x3 * x3 + x4 * x4
     ) / 2
 
+
+def eisensenteinE6(tau):
+    """
+    Eisenstein E-series of weight 6.
+    
+    Parameters
+    ----------
+    tau : complex
+        A complex number.
+        
+    Returns
+    -------
+    complex
+        The value of the Eisenstein E6 series at `tau`.
+        
+    """
+    q = qfrom(tau = tau)
+    j2 = jtheta(2, 0, q)
+    j3 = jtheta(3, 0, q)
+    j4 = jtheta(4, 0, q)
+    x3 = j3**4
+    x4 = j4**4
+    return (
+        x3**3 + x4**3 - 3 * j2**8 * (x3 + x4)
+    ) / 2
+
+
 def eisensteinG4(tau):
     """
     Eisenstein G-series of weight 4.
@@ -79,6 +106,25 @@ def eisensteinG4(tau):
     """
     return pi*pi*pi*pi / 45 * eisensenteinE4(tau)
 
+
+def eisensteinG6(tau):
+    """
+    Eisenstein G-series of weight 6.
+    
+    Parameters
+    ----------
+    tau : complex
+        A complex number.
+        
+    Returns
+    -------
+    complex
+        The value of the Eisenstein G6 series at `tau`.
+        
+    """
+    return 2 * pi**6 / 945 * eisensenteinE6(tau)
+
+
 def _half_periods(g2, g3):
     if g2 == 0:
         omega1 = g3^(-1/6) * gamma(1/3)**3 / 4 / pi
@@ -89,8 +135,11 @@ def _half_periods(g2, g3):
         if (isinf(j.real) or isinf(j.imag)):
             return -1j*pi/2/sqrt(3), mpc("inf", "inf")
         tau = kleinjinv(j)
-        t = 15 / 4 / g2 * eisensteinG4(tau)
-        omega1 = 1j * t**(0.25)
+        omega1 = sqrt(
+            7 * eisensteinG6(tau) * g2 / (12 * eisensteinG4(tau) * g3)
+        )
+        # t = 15 / 4 / g2 * eisensteinG4(tau)
+        # omega1 = 1j * t**(0.25)
     return omega1, tau
 
 def omega_from_g(g2, g3):
@@ -188,7 +237,6 @@ def _wpprime_from_omega1_and_tau(z, omega1, tau):
         2/(w1*w1*w1) * f * 
         jtheta(2, z1, q) * jtheta(3, z1, q) * jtheta(4, z1, q)
     )
-
 
 # Weierstrass p-function prime
 def wpprime(z, omega):

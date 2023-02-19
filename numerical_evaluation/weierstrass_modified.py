@@ -412,6 +412,37 @@ class Weierstrass:
         return self._wpprime_from_omega1_and_tau(z, omega1, omega2 / omega1)
 
 
+#     # Weierstrass sigma function
+#     def wsigma(self, z, omega):
+#         """
+#         Weierstrass sigma function.
+
+#         Parameters
+#         ----------
+#         z : complex
+#             A complex number.
+#         omega : complex pair
+#             A pair of complex numbers, the half-periods.
+
+#         Returns
+#         -------
+#         complex 
+#             The Weierstrass sigma function evaluated at `z`.
+            
+#         Note: The formula relating sigma to theta functions can be found here:
+#         https://mathworld.wolfram.com/WeierstrassSigmaFunction.html
+
+#         """
+#         omega1, omega2 = omega
+#         w1 = -2 * omega1 / pi
+#         tau = omega2 / omega1
+#         if im(tau) <= 0:
+#             raise Exception("The imaginary part of the periods ratio is negative.")
+#         q = qfrom(tau = tau)
+#         f = jtheta(1, 0, q, 1)
+#         h = -pi / 6 / w1 * jtheta(1, 0, q, 3) / f
+#         return w1 * exp(h*z*z/w1/pi) * jtheta(1, z/w1, q) / f
+
     # Weierstrass sigma function
     def wsigma(self, z, omega):
         """
@@ -428,17 +459,25 @@ class Weierstrass:
         -------
         complex 
             The Weierstrass sigma function evaluated at `z`.
+            
+        Note: The formula relating sigma to theta functions can be found here:
+        https://mathworld.wolfram.com/WeierstrassSigmaFunction.html
+        https://functions.wolfram.com/EllipticFunctions/WeierstrassSigma/27/01/02/0002/
 
         """
         omega1, omega2 = omega
-        w1 = -2 * omega1 / pi
+        z1 = pi * z / (2 * omega1)
         tau = omega2 / omega1
         if im(tau) <= 0:
             raise Exception("The imaginary part of the periods ratio is negative.")
         q = qfrom(tau = tau)
-        f = jtheta(1, 0, q, 1)
-        h = -pi / 6 / w1 * jtheta(1, 0, q, 3) / f
-        return w1 * exp(h*z*z/w1/pi) * jtheta(1, z/w1, q) / f
+        j10p = jtheta(1, 0, q, 1)
+        j10ppp = jtheta(1, 0, q, 3)
+        j1z1 = jtheta(1, z1, q)
+        w_sigma = 2 * omega1 / (pi * j10p) * exp( - z1 ** 2 * j10ppp / (6 * j10p) ) * j1z1
+        # eta1 = - pi ** 2 * j10ppp / ( 12 * omega1 * j10p)
+        # w_sigma = 2 * omega1 / (pi * j10p) * exp( eta1 * z ** 2 / (2 * omega1)) * j1z1
+        return w_sigma
 
     # Weierstrass zeta function
     def wzeta(self, z, omega):
