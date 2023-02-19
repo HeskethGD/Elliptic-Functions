@@ -189,6 +189,7 @@ def _wpprime_from_omega1_and_tau(z, omega1, tau):
         jtheta(2, z1, q) * jtheta(3, z1, q) * jtheta(4, z1, q)
     )
 
+
 # Weierstrass p-function prime
 def wpprime(z, omega):
     """

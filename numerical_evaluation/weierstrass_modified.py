@@ -370,17 +370,23 @@ class Weierstrass:
         return g2, g3
 
     def _wpprime_from_omega1_and_tau(self, z, omega1, tau):
+        """
+        https://functions.wolfram.com/EllipticFunctions/WeierstrassPPrime/27/02/03/
+        """
         q = qfrom(tau = tau)
-        w1 = 2 * omega1 / pi
-        z1 = - z / 2 / omega1 * pi
-        j10 = jtheta(1, 0, q, 1)
+        z1 = pi * z / (2 * omega1)
+        j10p = jtheta(1, 0, q, 1)
+        j20 = jtheta(2, 0, q)
+        j30 = jtheta(3, 0, q)
+        j40 = jtheta(4, 0, q)
+        k0 = j10p ** 3 / (j20 * j30 * j40)
         j1z1 = jtheta(1, z1, q)
-        f = j10*j10*j10 / (j1z1*j1z1*j1z1 * 
-            jtheta(2, 0, q) * jtheta(3, 0, q) * jtheta(4, 0, q))
-        return (
-            2/(w1*w1*w1) * f * 
-            jtheta(2, z1, q) * jtheta(3, z1, q) * jtheta(4, z1, q)
-        )
+        j2z1 = jtheta(2, z1, q)
+        j3z1 = jtheta(3, z1, q)
+        j4z1 = jtheta(4, z1, q)
+        kz = j2z1 * j3z1 * j4z1 / j1z1 ** 3
+        wp_prime = - pi ** 3 /( 4 * omega1 ** 3) * k0 * kz 
+        return wp_prime
 
     # Weierstrass p-function prime
     def wpprime(self, z, omega):
@@ -492,7 +498,7 @@ class Weierstrass:
         # e3 = self.wp(-omega1-omega2, omega)
         e1, e2, e3 = self.roots_from_omega1_omega2(omega1, omega2, sorting=False)
         z = elliprf(w-e1, w-e2, w-e3)
-        if wp_prime:
+        if w_prime:
             if abs(self.wpprime(-z, omega) - wp_prime) < abs(self.wpprime(z, omega) - wp_prime):
                 return -z
         return z
