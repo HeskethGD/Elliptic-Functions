@@ -505,12 +505,12 @@ class Weierstrass:
         omega1, omega2 = omega
         if im(omega2/omega1) <= 0:
             raise Exception("The imaginary part of the periods ratio is negative.")
-        # e1 = self.wp(omega1, omega)
-        # e2 = self.wp(omega2, omega)
-        # e3 = self.wp(-omega1-omega2, omega)
+#         e1 = self.wp(omega1, omega)
+#         e2 = self.wp(omega2, omega)
+#         e3 = self.wp(-omega1-omega2, omega)
         e1, e2, e3 = self.roots_from_omega1_omega2(omega1, omega2, sorting=False)
         z = elliprf(w-e1, w-e2, w-e3)
         if w_prime:
-            if abs(self.wpprime(-z, omega) - wp_prime) < abs(self.wpprime(z, omega) - wp_prime):
+            if abs(self.wpprime(-z, omega) - w_prime) < abs(self.wpprime(z, omega) - w_prime):
                 return -z
         return z
