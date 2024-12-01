@@ -346,6 +346,11 @@ class Weierstrass:
                 """
             )
         omega1, omega2, omega3 = [omegas[k] for k in index_combos[min_index]]
+        
+        # Define omega such that im(tau) has the right sign
+        if im(omega2/omega1) <= 0:
+            omega2 = -omega2
+        
         return omega1, omega2, omega3
 
     def g_from_omega(self, omega1, omega2):
@@ -451,6 +456,17 @@ class Weierstrass:
         # eta1 = - pi ** 2 * j10ppp / ( 12 * omega1 * j10p)
         # w_sigma = 2 * omega1 / (pi * j10p) * exp( eta1 * z ** 2 / (2 * omega1)) * j1z1
         return w_sigma
+    
+    def _mpc_to_float(self, mpc_val):
+        return float(mpc_val.real) + float(mpc_val.imag)*1j
+    
+    def _sympy_add_to_float(self, z):
+        try:
+            z_real, z_imag = z.as_real_imag()
+            return float(z_real) + float(z_imag)*1j
+        except:
+            return z
+    
 
     # Weierstrass zeta function
     def wzeta(self, z, omega):
@@ -514,3 +530,107 @@ class Weierstrass:
             if abs(self.wpprime(-z, omega) - w_prime) < abs(self.wpprime(z, omega) - w_prime):
                 return -z
         return z
+    
+    # Weierstrass sigma function
+    def wsigma_from_g2_g3(self, z, g2, g3):
+        """
+        Weierstrass sigma function.
+
+        Parameters
+        ----------
+        z : complex
+            A complex number.
+        g2 : complex
+            A complex number.
+        g3 : complex
+            A complex number.
+
+        Returns
+        -------
+        complex 
+            The Weierstrass sigma function evaluated at `z`.
+        """
+        
+        z = self._sympy_add_to_float(z)
+        g2 = self._sympy_add_to_float(g2)
+        g3 = self._sympy_add_to_float(g3)
+        omega = self.omega_from_g(g2, g3)
+        return self.wsigma(z, (omega[0], omega[1]))
+    
+    # Weierstrass p-function
+    def wp_from_g2_g3(self, z, g2, g3):
+        """
+        Weierstrass p-function.
+
+        Parameters
+        ----------
+        z : complex
+            A complex number.
+        g2 : complex
+            A complex number.
+        g3 : complex
+            A complex number.
+
+        Returns
+        -------
+        complex 
+            The Weierstrass p-function evaluated at `z`.
+
+        """
+        z = self._sympy_add_to_float(z)
+        g2 = self._sympy_add_to_float(g2)
+        g3 = self._sympy_add_to_float(g3)
+        omega = self.omega_from_g(g2, g3)
+        return self.wp(z, (omega[0], omega[1]))
+    
+    # Weierstrass p-function prime
+    def wpprime_from_g2_g3(self, z, g2, g3):
+        """
+        Derivative of Weierstrass p-function.
+
+        Parameters
+        ----------
+        z : complex
+            A complex number.
+        g2 : complex
+            A complex number.
+        g3 : complex
+            A complex number.
+
+        Returns
+        -------
+        complex 
+            The derivative of the Weierstrass p-function evaluated at `z`.
+
+        """
+        z = self._sympy_add_to_float(z)
+        g2 = self._sympy_add_to_float(g2)
+        g3 = self._sympy_add_to_float(g3)
+        omega = self.omega_from_g(g2, g3)
+        return self.wpprime(z, (omega[0], omega[1]))
+        
+    # Weierstrass zeta function
+    def wzeta_from_g2_g3(self, z, g2, g3):
+        """
+        Weierstrass zeta function.
+
+        Parameters
+        ----------
+        z : complex
+            A complex number.
+        g2 : complex
+            A complex number.
+        g3 : complex
+            A complex number.
+
+        Returns
+        -------
+        complex 
+            The Weierstrass zeta function evaluated at `z`.
+
+        """
+        z = self._sympy_add_to_float(z)
+        g2 = self._sympy_add_to_float(g2)
+        g3 = self._sympy_add_to_float(g3)
+        omega = self.omega_from_g(g2, g3)
+        return self.wzeta(z, (omega[0], omega[1]))

@@ -1,0 +1,98 @@
+\documentclass[12pt]{article}
+
+% Packages for mathematics
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Packages for formatting and fonts
+\usepackage{geometry}
+\usepackage{graphicx}
+
+% Adjust page margins
+\geometry{a4paper, margin=1in}
+
+% Title, author, and date
+\title{New eigenfunctions of the 2D Fourier transform and their connection to matrix integrals}
+\author{Graham Hesketh}
+\date{\today}
+
+\begin{document}
+
+% Title page
+\maketitle
+
+% Abstract
+\begin{abstract}
+This article introduces new eigenfunctions of the 2D Fourier transform. While the functions are but simple ratios of trigonometric and hyperbolic functions, to the best of the authors knowledge their eigenfunction properties have not yet been documented in the literature. The 2D integrals can also be written in matrix notation and may therefore find applications in random matrix theory, quantum mechanics, and number theory.
+\end{abstract}
+
+% Introduction section
+\section{Introduction}
+This work is inspired by one of the authors favourite questions on Mathematics Stack Exchange \cite{268789} and the answers provided to it, in particular \cite{3467595}. In that question user Ron Gordon asks:
+
+\begin{quote}
+Define a function $f(\alpha, \beta)$, $\alpha \in (-1,1)$, $\beta \in (-1,1)$ as
+\begin{equation}
+  \label{eq:gordon1}
+f(\alpha, \beta) = \int_0^{\infty} dx \: \frac{x^{\alpha}}{1+2 x \cos{(\pi \beta)} + x^2}
+\end{equation}
+One can use, for example, the Residue Theorem to show that
+\begin{equation}
+  \label{eq:gordon2}
+f(\alpha, \beta) = \frac{\pi \sin{\left (\pi \alpha \beta\right )}}{ \sin{\left (\pi \alpha\right )} \,  \sin{\left (\pi \beta\right )}} 
+\end{equation}
+Clearly, from this latter expression, $f(\alpha, \beta) = f(\beta, \alpha)$.  My question is, can one see this symmetry directly from the integral expression?
+\end{quote}
+
+To which user Szeto proves the following answer using Mellin transforms:
+
+\begin{equation}
+\label{eq:szeto}
+\int_0^{\infty} dx \: \frac{x^{\alpha}}{1+2 x \cos{(\pi \beta)} + x^2}
+= \frac{2}{\pi}\int_0^{\infty} \int^{\infty}_0 x^{\alpha}y^{\beta}\frac{\sin\left(\frac{\ln x \ln y}{\pi}\right)}{(x^2-1)(y^2-1)} \, dx \, dy
+\end{equation}
+
+The appearance of the logarithm inside the trigonometric function in equation~\ref{eq:szeto} looks a little unusual and it is clear that an exponential variable change would make the integrand look somewhat similar to the ratio of $\sin$ functions in equation~\ref{eq:gordon2}. For example, the following subsitutions with \(p_i \in (-\frac{1}{\sqrt 2},\frac{1}{\sqrt 2}) \):
+
+\begin{align}
+  x&=\exp \sqrt 2 \pi x_1 \label{eq:x_x1_sub} \\
+  y&=\exp \sqrt 2 \pi y_1 \label{eq:y_x2_sub} \\
+  \alpha&= \sqrt 2 p_1 \label{eq:alpha_p1_sub} \\
+  \beta&= \sqrt 2 p_2 \label{eq:beta_p2_sub} \\
+\end{align}
+
+together with equations~\ref{eq:gordon1} and ~\ref{eq:gordon2}, transform equation~\ref{eq:szeto} into:
+
+\begin{align}
+  \label{eq:exp_sub_szeto}
+  \frac{\sin{\left(2 \pi {p}_{1} {p}_{2} \right)}}{\sin{\left(\sqrt{2} \pi {p}_{1} \right)} \sin{\left(\sqrt{2} \pi {p}_{2} \right)}} = \int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty} \frac{e^{2 \pi \left({p}_{1} {x}_{1} + {p}_{2} {x}_{2}\right)} \sin{\left(2 \pi {x}_{1} {x}_{2} \right)}}{\sinh{\left(\sqrt{2} \pi {x}_{1} \right)} \sinh{\left(\sqrt{2} \pi {x}_{2} \right)}}\, d{x}_{1}\, d{x}_{2}
+\end{align}
+which is starting to look a little bit more symmetric in its function dependence and a little bit more like a 2D Fourier Transform. The rest of this article is dedicated to exploring eigenfunctions of the 2D Fourier Transform that are inspired by equations ~\ref{eq:szeto} and ~\ref{eq:exp_sub_szeto}.
+
+
+\section{The first eigenfunction of the 2D Fourier Transform}
+
+
+\begin{equation}
+E = mc^2
+\end{equation}
+
+We can also include inline mathematics, such as \( a^2 + b^2 = c^2 \), within the text.
+
+% Subsection with more complex mathematics
+\subsection{Quadratic Formula}
+The quadratic formula is used to solve quadratic equations of the form \( ax^2 + bx + c = 0 \). It is given by:
+
+\begin{equation}
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+\end{equation}
+
+% Conclusion section
+\section{Conclusion}
+This simple article demonstrates how to use LaTeX to create a mathematical document. LaTeX is highly customizable and can be used to create complex documents with ease.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
+
