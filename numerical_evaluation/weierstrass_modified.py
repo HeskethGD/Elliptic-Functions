@@ -1,5 +1,4 @@
 from mpmath import jtheta, pi, exp, sqrt, agm, qfrom, mpc, elliprf, im, zeta, polyroots, almosteq, gamma
-from math import isinf
 
 class Weierstrass:
     
@@ -54,11 +53,28 @@ class Weierstrass:
         https://en.wikipedia.org/wiki/J-invariant
 
         """
-        if (isinf(_j.real) or isinf(_j.imag)):
+        isinf_condition = False
+        try:
+            # Note there is s type definition variation on j so the below does not always work. 
+            # Revisit this later but for now we wrap in try/except
+            isinf_condition = (isinf(_j.real) or isinf(_j.imag))
+        except:
+            pass
+            
+        if isinf_condition:
             x = 0
         else:
-            t = ( -_j**3 + 2304*_j**2 - 884736*_j + 12288*sqrt(3*(1728*_j**2 - _j**3)) )**(1/3)
+            sqrt_arg = 3*(1728*_j**2 - _j**3)
+            try:
+                sqrt_arg = sqrt_arg.evalf()
+            except:
+                pass
+            t = ( -_j**3 + 2304*_j**2 - 884736*_j + 12288*sqrt(sqrt_arg) )**(1/3)
             x = 1/768*t + (1 - _j/768) - ( 1536*_j - _j**2 ) / (768*t)
+            try:
+                x = x.evalf()
+            except:
+                pass
         lbd = (1 + sqrt(1 - 4*x)) / 2 # there are two possible choices here +/- sqrt
         tau = 1j * agm(1, sqrt(1-lbd)) / agm(1, sqrt(lbd))
         return tau
@@ -138,8 +154,17 @@ class Weierstrass:
             A complex number.
         """
         j = self.kleinj(g2, g3)
-        if (isinf(j.real) or isinf(j.imag)):
-            return -1j*pi/2/sqrt(3), mpc("inf", "inf")
+        try:
+            j = j.evalf()
+        except:
+            pass
+        try:
+            # Note there is s type definition variation on j so the below does not always work. 
+            # Revisit this later but for now we wrap in try/except
+            if (isinf(j.real) or isinf(j.imag)):
+                return -1j*pi/2/sqrt(3), mpc("inf", "inf")
+        except:
+            pass
         tau = self.inverse_kleinj(j)
         
         return tau
@@ -321,8 +346,13 @@ class Weierstrass:
             omegaA = 1j * (15 / 4 / g2 * G4) ** (1/4)
         else:
             tau = self.tau_from_g(g2, g3)
-            G4, G6 = self.eisenstein_G4_G6(tau) # G4(1,tau), G6(1, tau) 
-            omegaA = sqrt(g2/g3 * G6/G4 * 7/12)
+            G4, G6 = self.eisenstein_G4_G6(tau) # G4(1,tau), G6(1, tau)
+            _sqrt_arg = g2/g3 * G6/G4 * 7/12
+            try:
+                _sqrt_arg = _sqrt_arg.evalf()
+            except:
+                pass
+            omegaA = sqrt(_sqrt_arg)
             
         omegaB = tau * omegaA
         omegaC = omegaA + omegaB
